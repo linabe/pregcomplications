@@ -1,0 +1,215 @@
+```{r predor, cache=cacheon}
+
+ormod <- function(outvar, outname = NULL) {
+  if (is.null(outname)) outname <- outvar
+
+  # adj
+  ormod <- glm(formula(paste0(outvar, "== '1' ~ ", paste(modvars, collapse = " + "))),
+    data = cleandata,
+    family = binomial(link = "logit")
+  )
+
+  sormod <- summary(ormod)
+
+  nval <- nrow(sormod$coefficients)
+  outor <- bind_cols(
+    Variable = rownames(sormod$coefficients)[2:nval],
+    adjor = paste0(
+      fn(exp(sormod$coefficients[2:nval, 1]), 1), " (",
+      fn(exp(sormod$coefficients[2:nval, 1] - global_z05 * sormod$coefficients[2:nval, 2]), 1), "-",
+      fn(exp(sormod$coefficients[2:nval, 1] + global_z05 * sormod$coefficients[2:nval, 2]), 1), "), ",
+      fn(sormod$coefficients[2:nval, 4], dig = 3, p = TRUE)
+    )
+  )
+
+  outor <- outor %>%
+    mutate(crudeor = NA_character_) %>%
+    select(Variable, crudeor, adjor)
+
+  # crude
+  for (i in seq_along(modvars)) {
+    ormod <- glm(formula(paste0(outvar, "== '1' ~ ", modvars[i])),
+      data = cleandata,
+      family = binomial(link = "logit")
+    )
+
+    sormod <- summary(ormod)
+
+    nval <- nrow(sormod$coefficients)
+    outor_crude <- bind_cols(
+      Variable = rownames(sormod$coefficients)[2:nval],
+      crudeor = paste0(
+        fn(exp(sormod$coefficients[2:nval, 1]), 1), " (",
+        fn(exp(sormod$coefficients[2:nval, 1] - global_z05 * sormod$coefficients[2:nval, 2]), 1), "-",
+        fn(exp(sormod$coefficients[2:nval, 1] + global_z05 * sormod$coefficients[2:nval, 2]), 1), "), ",
+        fn(sormod$coefficients[2:nval, 4], dig = 3, p = TRUE)
+      )
+    )
+
+    outor <- full_join(outor, outor_crude, by = "Variable") %>%
+      mutate(crudeor = coalesce(crudeor.x, crudeor.y)) %>%
+      select(Variable, crudeor, adjor)
+  }
+
+  colnames(outor) <- sanitize_text(c("Variable", "Crude OR (95% CI), p-value", "Adjusted OR (95% CI), p-value"))
+
+  outor <- outor %>%
+    mutate(Variable = str_remove(Variable, "1"))
+
+  default_kable(outor,
+    caption = sanitize_text(paste0("Association with pregnancy outcome - ", outname)),
+    longtable = TRUE,
+    escape = FALSE
+  )
+}
+
+pormod <- function(outvar, outname = NULL) {
+  if (is.null(outname)) outname <- outvar
+
+  mod <- polr(formula(paste0(outvar, " ~ ", paste(modvars, collapse = " + "))),
+    data = cleandata,
+    Hess = TRUE
+  )
+
+  smod <- summary(mod)
+
+  nval <- length(mod$coefficients)
+
+  p <- (pnorm(abs(smod$coefficients[, "t value"]), lower.tail = FALSE) * 2)[1:nval]
+  outor <- bind_cols(
+    Variable = rownames(smod$coefficients)[1:nval],
+    adjor = paste0(
+      fn(exp(smod$coefficients[1:nval, 1]), 1), " (",
+      fn(exp(smod$coefficients[1:nval, 1] - global_z05 * smod$coefficients[1:nval, 2]), 1), "-",
+      fn(exp(smod$coefficients[1:nval, 1] + global_z05 * smod$coefficients[1:nval, 2]), 1), "), ",
+      fn(p, dig = 3, p = TRUE)
+    )
+  )
+
+  outor <- outor %>%
+    mutate(crudeor = NA_character_) %>%
+    select(Variable, crudeor, adjor)
+
+  # crude
+  for (i in seq_along(modvars)) {
+    mod <- polr(formula(paste0(outvar, " ~ ", modvars[i])),
+      data = cleandata,
+      Hess = TRUE
+    )
+
+    smod <- summary(mod)
+
+    nval <- length(mod$coefficients)
+
+    p <- (pnorm(abs(smod$coefficients[, "t value"]), lower.tail = FALSE) * 2)[1:nval]
+    outor_crude <- bind_cols(
+      Variable = rownames(smod$coefficients)[1:nval],
+      crudeor = paste0(
+        fn(exp(smod$coefficients[1:nval, 1]), 1), " (",
+        fn(exp(smod$coefficients[1:nval, 1] - global_z05 * smod$coefficients[1:nval, 2]), 1), "-",
+        fn(exp(smod$coefficients[1:nval, 1] + global_z05 * smod$coefficients[1:nval, 2]), 1), "), ",
+        fn(p, dig = 3, p = TRUE)
+      )
+    )
+
+    outor <- full_join(outor, outor_crude, by = "Variable") %>%
+      mutate(crudeor = coalesce(crudeor.x, crudeor.y)) %>%
+      select(Variable, crudeor, adjor)
+  }
+
+  colnames(outor) <- sanitize_text(c("Variable", "Crude OR (95% CI), p-value", "Adjusted OR (95% CI), p-value"))
+
+  outor <- outor %>%
+    mutate(Variable = str_remove(Variable, "1"))
+
+  default_kable(outor,
+    caption = sanitize_text(paste0("Association with pregnancy outcome - ", outname)),
+    longtable = TRUE,
+    escape = FALSE
+  )
+}
+```
+
+\clearpage
+
+```{r predorprint1, dependson="predor", cache=cacheon}
+ormod(outvars_binary[1])
+```
+
+\clearpage
+
+```{r predorprint2, dependson="predor", cache=cacheon}
+ormod(outvars_binary[2])
+```
+
+\clearpage
+
+```{r predorprint3, dependson="predor", cache=cacheon}
+ormod(outvars_binary[3])
+```
+
+\clearpage
+
+```{r predorprint4, dependson="predor", cache=cacheon}
+ormod(outvars_binary[4])
+```
+
+\clearpage
+
+```{r predorprint5, dependson="predor", cache=cacheon}
+ormod(outvars_binary[5])
+```
+
+\clearpage
+
+```{r predorprint6, dependson="predor", cache=cacheon}
+ormod(outvars_binary[6])
+```
+
+\clearpage
+
+```{r predorprint7, dependson="predor", cache=cacheon}
+ormod(outvars_binary[7])
+```
+
+\clearpage
+
+```{r predorprint8, dependson="predor", cache=cacheon}
+ormod(outvars_binary[8])
+```
+
+\clearpage
+
+```{r predorprint9, dependson="predor", cache=cacheon}
+ormod(outvars_binary[9])
+```
+
+\clearpage
+
+```{r predorprint10, dependson="predor", cache=cacheon}
+ormod(outvars_binary[10])
+```
+
+\clearpage
+
+```{r predorprint11, dependson="predor", cache=cacheon}
+ormod(outvars_binary[11])
+```
+
+\clearpage
+
+```{r predporprint1, dependson="predor", cache=cacheon}
+pormod(outvars_ordinal[1])
+```
+
+\clearpage
+
+```{r predporprint2, dependson="predor", cache=cacheon}
+pormod(outvars_ordinal[2])
+```
+
+\clearpage
+
+```{r predporprint3, dependson="predor", cache=cacheon}
+pormod(outvars_ordinal[3])
+```

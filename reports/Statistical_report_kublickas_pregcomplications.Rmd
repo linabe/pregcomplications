@@ -1,0 +1,135 @@
+---
+title: 'Statistical report: Complications pregnancy'
+subtitle: 'DRAFT'
+author: 'Statistician: Lina Benson'
+  
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 7
+    fig_width: 7
+    number_sections: yes
+link-citations: yes
+bibliography: references.bib
+nocite: '@*'
+header-includes:
+   - \usepackage{draftwatermark}
+---
+
+\newpage 
+\tableofcontents 
+\listoftables
+\listoffigures
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, include = TRUE, comment = "",
+  warning = FALSE, message = FALSE, fig.pos = "H",
+  fig.path = "../output/figs/"
+)
+options(knitr.kable.NA = "")
+```
+
+```{r adjust_directory_if_needed, include=FALSE}
+# Uncomment lines below if rmd file is placed in a subdirectory
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+```
+
+```{r load_project}
+# 1. Set options in config/global.dcf
+# 2. Load packages listed in config/global.dcf
+# 3. Import functions and code in lib directory
+
+ProjectTemplate::reload.project()
+
+cacheon <- TRUE
+```             
+
+# Data handling
+
+## Data source
+
+File used: 201214 - IMPROVED cleaned and coded.xlsx. 
+
+Cleaned data filen innehåller färre observationer än rawdata filen. Är det som det ska? Inga andra inklusion/exclusions kriterier ska appliceras?
+
+# Statistical analysis 
+
+## General
+
+All analyses were performed using `r sessionInfo()$R.version$version.string` [@r]. 
+The level of significance is set to 5%, two-sided. No adjustment for multiple 
+comparisons were made and therefore the results should be viewed with some care.
+
+## Missing data
+
+The amount of missing data is small. Therefore the risk of bias due to missing 
+data is negligible and no imputation is performed and all analysis are performed 
+on complete case analysis. Except for income. Therefore a sensitivity analysis is performed excluding income? Imputation?
+
+## Baseline characteristics
+
+```{r, child = "../src/tab1.Rmd"}
+
+```
+
+Ev kan vara bra att gruppindela inkomst inom land? Inkomstnivåer kan vara olika i 
+olika länder och tror mer relevant ur socioek perspektiv om man är låg inkomsttagare i sitt eget land. 
+
+## Association with pregnancy outcomes
+
+```{r, child = "../src/outdesk.Rmd"}
+
+```
+
+The association between the socioeconomic covariates and the respective pregnancy 
+outcomes were investigated using a logistic regression model for the binary outcomes 
+and a proportional odds model for the outcomes with > 2 levels. (Ev modellera land som random effekt i GEE modell.)
+
+```{r, child = "../src/outcome.Rmd"}
+
+```
+
+
+Frågor/kommentarer: 
+
+- Tror bra att inkludera land också. Det kan finnas landeffekterna och även om 
+man inte är sepcifikt intresserad av land så bra att justera för (gäller kanske också bmi, ålder och sys bp, inte intresserad av dem per se men bara att justera för?).
+- Flera modeller konvergerar inte (de som får väldigt stora värden, ex Inf). 
+Beror på att inte finns tillräckligt med utfall i respektive grupp för den variabeln. 
+Om man klumpar ihop utfallen och inte presenterar de individuella utfallen kan detta dock komma att lösa sig så behöver inte fundera alltför mycket nu. Kan dock bli svårt även fortsättningsvis med epelepsi och RA.
+- Man kan inte ta med variabler som är väldigt korrelerade (ex sys bp och dia bp, tog där bara med sys bp, kan också ta ex map istället). 
+Finns det kliniska variabler som man vet är väldigt korrelerade? Den innebär också att man inte bör ta med både Partner och Cohabitating (vilken är bäst?).
+- Fler/färre variabler som ska tas med i modellerna?
+- Kategorisera kontinuerliga variabler (ålder, bmi bp)? Kan ta beslut om det sen när utfallen är spikade. Att tänka på redan nu: är dessa variabler intressant kliniskt eller vill ni enbart justera för dem?
+- Vilka utfall ska presenteras? Hur gruppera ihop dem? Vikta på alvarlighetsgrad? Separata barn/moder utfall?
+
+### Assumptions
+
+To do: Outliers were investigated with Cook's distance and multicollinearity 
+with the variance inflation factor. 
+The continuous variables were checked for linearity using splines. Proportional odds assumption was assessed... 
+=> Action...???. 
+
+\clearpage
+\newpage
+
+# Reproducibility
+
+## R session information {#sessioninfo}
+
+```{r sessinfo}
+sessionInfo()
+```
+
+## R code
+
+The R code for all data handling and statistical analyses are found: 
+https://github.com/KIHeartFailure/pregcomplications. On publication
+the repository will be made public so as to 
+link to it from the resulting article for increased transparency and code sharing.
+No data or output is stored in the repository. 
+
+# References
