@@ -1,11 +1,11 @@
 ```{r predor, cache=cacheon}
 
-ormod <- function(outvar, outname = NULL) {
+ormod <- function(outvar, outname = NULL, data = cleandata) {
   if (is.null(outname)) outname <- outvar
 
   # adj
   ormod <- glm(formula(paste0(outvar, "== '1' ~ ", paste(modvars, collapse = " + "))),
-    data = cleandata,
+    data = data,
     family = binomial(link = "logit")
   )
 
@@ -29,7 +29,7 @@ ormod <- function(outvar, outname = NULL) {
   # crude
   for (i in seq_along(modvars)) {
     ormod <- glm(formula(paste0(outvar, "== '1' ~ ", modvars[i])),
-      data = cleandata,
+      data = data,
       family = binomial(link = "logit")
     )
 
@@ -54,7 +54,10 @@ ormod <- function(outvar, outname = NULL) {
   colnames(outor) <- sanitize_text(c("Variable", "Crude OR (95% CI), p-value", "Adjusted OR (95% CI), p-value"))
 
   outor <- outor %>%
-    mutate(Variable = str_remove(Variable, "1"))
+    mutate(
+      Variable = str_remove(Variable, "1"),
+      Variable = sanitize_text(Variable)
+    )
 
   default_kable(outor,
     caption = sanitize_text(paste0("Association with pregnancy outcome - ", outname)),
@@ -63,11 +66,11 @@ ormod <- function(outvar, outname = NULL) {
   )
 }
 
-pormod <- function(outvar, outname = NULL) {
+pormod <- function(outvar, outname = NULL, data = cleandata) {
   if (is.null(outname)) outname <- outvar
 
   mod <- polr(formula(paste0(outvar, " ~ ", paste(modvars, collapse = " + "))),
-    data = cleandata,
+    data = data,
     Hess = TRUE
   )
 
@@ -93,7 +96,7 @@ pormod <- function(outvar, outname = NULL) {
   # crude
   for (i in seq_along(modvars)) {
     mod <- polr(formula(paste0(outvar, " ~ ", modvars[i])),
-      data = cleandata,
+      data = data,
       Hess = TRUE
     )
 
@@ -120,7 +123,10 @@ pormod <- function(outvar, outname = NULL) {
   colnames(outor) <- sanitize_text(c("Variable", "Crude OR (95% CI), p-value", "Adjusted OR (95% CI), p-value"))
 
   outor <- outor %>%
-    mutate(Variable = str_remove(Variable, "1"))
+    mutate(
+      Variable = str_remove(Variable, "1"),
+      Variable = sanitize_text(Variable)
+    )
 
   default_kable(outor,
     caption = sanitize_text(paste0("Association with pregnancy outcome - ", outname)),
@@ -133,83 +139,83 @@ pormod <- function(outvar, outname = NULL) {
 \clearpage
 
 ```{r predorprint1, dependson="predor", cache=cacheon}
-ormod(outvars_binary[1])
+ormod(outvarsmat[1], outname = "Maternal outcome Preeclampsia")
 ```
 
 \clearpage
 
 ```{r predorprint2, dependson="predor", cache=cacheon}
-ormod(outvars_binary[2])
+ormod(outvarsmat[2], outname = "Maternal outcome Gestational hypertension")
 ```
 
 \clearpage
 
 ```{r predorprint3, dependson="predor", cache=cacheon}
-ormod(outvars_binary[3])
+ormod(outvarsmat[3], outname = "Maternal outcome Gestational diabetes")
 ```
 
 \clearpage
 
 ```{r predorprint4, dependson="predor", cache=cacheon}
-ormod(outvars_binary[4])
+ormod(outvarsmat[4], outname = "Maternal outcome Emergency SC")
 ```
 
 \clearpage
 
 ```{r predorprint5, dependson="predor", cache=cacheon}
-ormod(outvars_binary[5])
+ormod(outvarsmat[5], outname = "Maternal outcome Placental abruption")
 ```
 
 \clearpage
 
 ```{r predorprint6, dependson="predor", cache=cacheon}
-ormod(outvars_binary[6])
+pormod(outvarsneo[1], outname = "Neonatal outcome Gest age Delivery")
 ```
 
 \clearpage
 
 ```{r predorprint7, dependson="predor", cache=cacheon}
-ormod(outvars_binary[7])
+ormod(outvarsneo[2], outname = "Neonatal outcome Gest age Delivery preterm")
 ```
 
 \clearpage
 
 ```{r predorprint8, dependson="predor", cache=cacheon}
-ormod(outvars_binary[8])
+ormod(outvarsneo[3], outname = "Neonatal outcome Customized birth centile SGA")
 ```
 
 \clearpage
 
 ```{r predorprint9, dependson="predor", cache=cacheon}
-ormod(outvars_binary[9])
+ormod(outvarsneo[4], outname = "Neonatal outcome Customized birth centile LGA")
 ```
 
 \clearpage
 
 ```{r predorprint10, dependson="predor", cache=cacheon}
-ormod(outvars_binary[10])
+pormod(outvarsneo[5], outname = "Neonatal outcome Cord artery pH")
 ```
 
 \clearpage
 
 ```{r predorprint11, dependson="predor", cache=cacheon}
-ormod(outvars_binary[11])
+pormod(outvarsneo[6], outname = "Neonatal outcome Cord artery BE")
 ```
 
 \clearpage
 
-```{r predporprint1, dependson="predor", cache=cacheon}
-pormod(outvars_ordinal[1])
+```{r predorprint12, dependson="predor", cache=cacheon}
+pormod(outvarsneo[7], outname = "Neonatal outcome Apgar 1 min")
 ```
 
 \clearpage
 
-```{r predporprint2, dependson="predor", cache=cacheon}
-pormod(outvars_ordinal[2])
+```{r predorprint13, dependson="predor", cache=cacheon}
+pormod(outvarsneo[8], outname = "Neonatal outcome Apgar 5 min")
 ```
 
 \clearpage
 
-```{r predporprint3, dependson="predor", cache=cacheon}
-pormod(outvars_ordinal[3])
+```{r predorprint14, dependson="predor", cache=cacheon}
+ormod(outvarsneo[9], outname = "Intubation")
 ```

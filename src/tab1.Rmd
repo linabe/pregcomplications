@@ -35,12 +35,12 @@ colnames(tab1) <- c(
 footnote(
   default_kable(tab1,
     caption = "Baseline characteristics",
-    escape = FALSE, 
+    escape = FALSE,
     longtable = T
   ),
   general = c(
     "Categorical variables are presented with n (%) and continuous variables with median [q1-q3]. "
-  ), 
+  ),
   threeparttable = TRUE
 )
 ```

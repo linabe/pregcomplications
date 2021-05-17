@@ -1,7 +1,8 @@
-```{r outdesk, cache=cacheon}
+```{r outdeskmat, cache=cacheon}
 tab1 <- print(
   CreateTableOne(
-    vars = c(outvars_binary, outvars_ordinal),
+    vars = c(outvarsmat),
+    factorVars = c(outvarsmat),
     data = cleandata
   ),
   missing = TRUE,
@@ -34,8 +35,55 @@ colnames(tab1) <- c(
 
 footnote(
   default_kable(tab1,
-    caption = "Overview outcomes",
-    escape = FALSE, 
+    caption = "Overview Maternal outcomes",
+    escape = FALSE,
+    scale_down = FALSE
+  ),
+  general = c(
+    "Categorical variables are presented with n (%). "
+  )
+)
+```
+
+```{r outdeskneo, cache=cacheon}
+tab1 <- print(
+  CreateTableOne(
+    vars = c(outvarsneo),
+    factorVars = c(outvarsneo),
+    data = cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1)
+  ),
+  missing = TRUE,
+  printToggle = FALSE,
+  nonnormal = tabvars,
+  test = FALSE,
+  catDigits = 1,
+  contDigits = 1,
+  explain = FALSE,
+  noSpaces = TRUE
+)
+tab1 <- as_tibble(cbind(Variable = rownames(tab1), tab1)) %>%
+  select(Variable, Missing, Overall)
+
+tab1 <- tab1 %>%
+  mutate(
+    # remove = 1
+    across(everything(), str_replace_all, fixed(" = 1"), ""),
+
+    # so no probs
+    Variable = sanitize_text(Variable),
+    # space in Latex output (fix this other way?)
+    Variable = sub("  ", ". ", Variable)
+  )
+
+colnames(tab1) <- c(
+  "Variable",
+  sanitize_text("Missing (%)"), "Overall"
+)
+
+footnote(
+  default_kable(tab1,
+    caption = "Overview neonatal outcomes (excluding Intrauterine fetal death)",
+    escape = FALSE,
     scale_down = FALSE
   ),
   general = c(

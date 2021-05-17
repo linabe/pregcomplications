@@ -13,5 +13,5 @@ ProjectTemplate::reload.project(
 ProjectTemplate::cache("cleandata")
 ProjectTemplate::cache("tabvars")
 ProjectTemplate::cache("modvars")
-ProjectTemplate::cache("outvars_binary")
-ProjectTemplate::cache("outvars_ordinal")
+ProjectTemplate::cache("outvarsmat")
+ProjectTemplate::cache("outvarsneo")

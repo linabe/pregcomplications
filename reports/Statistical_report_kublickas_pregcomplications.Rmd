@@ -44,16 +44,16 @@ knitr::opts_knit$set(root.dir = normalizePath("../"))
 
 ProjectTemplate::reload.project()
 
-cacheon <- TRUE
+cacheon <- FALSE
 ```             
 
 # Data handling
 
 ## Data source
 
-File used: 201214 - IMPROVED cleaned and coded.xlsx. 
+File used: IMPROVED cleaned 20210421.xlsx. 
 
-Cleaned data filen innehåller färre observationer än rawdata filen. Är det som det ska? Inga andra inklusion/exclusions kriterier ska appliceras?
+No selection criteria applied. OK? For the neonatal outcomes Intrauterine fetal death are excluded. 
 
 # Statistical analysis 
 
@@ -75,9 +75,6 @@ on complete case analysis. Except for income. Therefore a sensitivity analysis i
 
 ```
 
-Ev kan vara bra att gruppindela inkomst inom land? Inkomstnivåer kan vara olika i 
-olika länder och tror mer relevant ur socioek perspektiv om man är låg inkomsttagare i sitt eget land. 
-
 ## Association with pregnancy outcomes
 
 ```{r, child = "../src/outdesk.Rmd"}
@@ -86,25 +83,11 @@ olika länder och tror mer relevant ur socioek perspektiv om man är låg inkoms
 
 The association between the socioeconomic covariates and the respective pregnancy 
 outcomes were investigated using a logistic regression model for the binary outcomes 
-and a proportional odds model for the outcomes with > 2 levels. (Ev modellera land som random effekt i GEE modell.)
+and a proportional odds model for the outcomes with > 2 levels. 
 
 ```{r, child = "../src/outcome.Rmd"}
 
 ```
-
-
-Frågor/kommentarer: 
-
-- Tror bra att inkludera land också. Det kan finnas landeffekterna och även om 
-man inte är sepcifikt intresserad av land så bra att justera för (gäller kanske också bmi, ålder och sys bp, inte intresserad av dem per se men bara att justera för?).
-- Flera modeller konvergerar inte (de som får väldigt stora värden, ex Inf). 
-Beror på att inte finns tillräckligt med utfall i respektive grupp för den variabeln. 
-Om man klumpar ihop utfallen och inte presenterar de individuella utfallen kan detta dock komma att lösa sig så behöver inte fundera alltför mycket nu. Kan dock bli svårt även fortsättningsvis med epelepsi och RA.
-- Man kan inte ta med variabler som är väldigt korrelerade (ex sys bp och dia bp, tog där bara med sys bp, kan också ta ex map istället). 
-Finns det kliniska variabler som man vet är väldigt korrelerade? Den innebär också att man inte bör ta med både Partner och Cohabitating (vilken är bäst?).
-- Fler/färre variabler som ska tas med i modellerna?
-- Kategorisera kontinuerliga variabler (ålder, bmi bp)? Kan ta beslut om det sen när utfallen är spikade. Att tänka på redan nu: är dessa variabler intressant kliniskt eller vill ni enbart justera för dem?
-- Vilka utfall ska presenteras? Hur gruppera ihop dem? Vikta på alvarlighetsgrad? Separata barn/moder utfall?
 
 ### Assumptions
 
