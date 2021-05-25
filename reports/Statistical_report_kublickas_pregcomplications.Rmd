@@ -53,7 +53,7 @@ cacheon <- FALSE
 
 File used: IMPROVED cleaned 20210421.xlsx. 
 
-No selection criteria applied. OK? For the neonatal outcomes Intrauterine fetal death are excluded. 
+No selection criteria applied. For the neonatal outcomes Intrauterine fetal death are excluded. 
 
 # Statistical analysis 
 
@@ -65,9 +65,14 @@ comparisons were made and therefore the results should be viewed with some care.
 
 ## Missing data
 
-The amount of missing data is small. Therefore the risk of bias due to missing 
+Income was missing in 15% and was therefore imputed with the type value (Middle).  
+
+If cord artery pH or BE was missing it was imputed with Normal (0) if Apgar score at 5 min was Normal (0). 
+
+For the other variables the amount of missing data is small. 
+Therefore the risk of bias due to missing 
 data is negligible and no imputation is performed and all analysis are performed 
-on complete case analysis. Except for income. Therefore a sensitivity analysis is performed excluding income? Imputation?
+on complete case analysis.
 
 ## Baseline characteristics
 
@@ -77,13 +82,17 @@ on complete case analysis. Except for income. Therefore a sensitivity analysis i
 
 ## Association with pregnancy outcomes
 
-```{r, child = "../src/outdesk.Rmd"}
-
-```
-
 The association between the socioeconomic covariates and the respective pregnancy 
 outcomes were investigated using a logistic regression model for the binary outcomes 
 and a proportional odds model for the outcomes with > 2 levels. 
+
+The variables included in the models are 
+`r paste0(modvars, collapse = ", ")` except for placenta abruption were the number of variables was limited 
+to `r paste0(modvars2, collapse = ", ")` are included due to too few outcomes. 
+
+```{r, child = "../src/outdesk.Rmd"}
+
+```
 
 ```{r, child = "../src/outcome.Rmd"}
 
@@ -91,10 +100,10 @@ and a proportional odds model for the outcomes with > 2 levels.
 
 ### Assumptions
 
-To do: Outliers were investigated with Cook's distance and multicollinearity 
+Outliers were investigated with Cook's distance and multicollinearity 
 with the variance inflation factor. 
-The continuous variables were checked for linearity using splines. Proportional odds assumption was assessed... 
-=> Action...???. 
+Proportional odds assumption was assessed using the Brant test. 
+=> No action was deemed necessary. 
 
 \clearpage
 \newpage

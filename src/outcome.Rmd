@@ -1,10 +1,10 @@
 ```{r predor, cache=cacheon}
 
-ormod <- function(outvar, outname = NULL, data = cleandata) {
+ormod <- function(outvar, outname = NULL, data = cleandata, adjvars = modvars) {
   if (is.null(outname)) outname <- outvar
 
   # adj
-  ormod <- glm(formula(paste0(outvar, "== '1' ~ ", paste(modvars, collapse = " + "))),
+  ormod <- glm(formula(paste0(outvar, "== '1' ~ ", paste(adjvars, collapse = " + "))),
     data = data,
     family = binomial(link = "logit")
   )
@@ -27,8 +27,8 @@ ormod <- function(outvar, outname = NULL, data = cleandata) {
     select(Variable, crudeor, adjor)
 
   # crude
-  for (i in seq_along(modvars)) {
-    ormod <- glm(formula(paste0(outvar, "== '1' ~ ", modvars[i])),
+  for (i in seq_along(adjvars)) {
+    ormod <- glm(formula(paste0(outvar, "== '1' ~ ", adjvars[i])),
       data = data,
       family = binomial(link = "logit")
     )
@@ -66,10 +66,10 @@ ormod <- function(outvar, outname = NULL, data = cleandata) {
   )
 }
 
-pormod <- function(outvar, outname = NULL, data = cleandata) {
+pormod <- function(outvar, outname = NULL, data = cleandata, adjvars = modvars) {
   if (is.null(outname)) outname <- outvar
 
-  mod <- polr(formula(paste0(outvar, " ~ ", paste(modvars, collapse = " + "))),
+  mod <- polr(formula(paste0(outvar, " ~ ", paste(adjvars, collapse = " + "))),
     data = data,
     Hess = TRUE
   )
@@ -94,8 +94,8 @@ pormod <- function(outvar, outname = NULL, data = cleandata) {
     select(Variable, crudeor, adjor)
 
   # crude
-  for (i in seq_along(modvars)) {
-    mod <- polr(formula(paste0(outvar, " ~ ", modvars[i])),
+  for (i in seq_along(adjvars)) {
+    mod <- polr(formula(paste0(outvar, " ~ ", adjvars[i])),
       data = data,
       Hess = TRUE
     )
@@ -139,83 +139,95 @@ pormod <- function(outvar, outname = NULL, data = cleandata) {
 \clearpage
 
 ```{r predorprint1, dependson="predor", cache=cacheon}
-ormod(outvarsmat[1], outname = "Maternal outcome Preeclampsia")
+ormod("Preeclampsia...226", outname = "Maternal outcome Preeclampsia")
 ```
 
 \clearpage
 
 ```{r predorprint2, dependson="predor", cache=cacheon}
-ormod(outvarsmat[2], outname = "Maternal outcome Gestational hypertension")
+ormod("Gestational.hypertension_GH", outname = "Maternal outcome Gestational hypertension")
 ```
 
 \clearpage
 
 ```{r predorprint3, dependson="predor", cache=cacheon}
-ormod(outvarsmat[3], outname = "Maternal outcome Gestational diabetes")
+ormod("Gestational.diabetes_GDM", outname = "Maternal outcome Gestational diabetes")
 ```
 
 \clearpage
 
 ```{r predorprint4, dependson="predor", cache=cacheon}
-ormod(outvarsmat[4], outname = "Maternal outcome Emergency SC")
+ormod("Emergency.SC", outname = "Maternal outcome Emergency SC")
 ```
 
 \clearpage
 
 ```{r predorprint5, dependson="predor", cache=cacheon}
-ormod(outvarsmat[5], outname = "Maternal outcome Placental abruption")
+ormod("Placental.Abruption...238", outname = "Maternal outcome Placental abruption", adjvars = modvars2)
 ```
 
 \clearpage
 
 ```{r predorprint6, dependson="predor", cache=cacheon}
-pormod(outvarsneo[1], outname = "Neonatal outcome Gest age Delivery")
+pormod("Gest_age_cat", outname = "Neonatal outcome Gest age Delivery", cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1))
 ```
 
 \clearpage
 
 ```{r predorprint7, dependson="predor", cache=cacheon}
-ormod(outvarsneo[2], outname = "Neonatal outcome Gest age Delivery preterm")
+ormod("Gest_age_postterm", outname = "Neonatal outcome Gest age Delivery postterm", cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1))
 ```
 
 \clearpage
 
 ```{r predorprint8, dependson="predor", cache=cacheon}
-ormod(outvarsneo[3], outname = "Neonatal outcome Customized birth centile SGA")
+ormod("Customised.Birthweight.Centile_sga",
+  outname = "Neonatal outcome Customized birth centile SGA",
+  cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1)
+)
 ```
 
 \clearpage
 
 ```{r predorprint9, dependson="predor", cache=cacheon}
-ormod(outvarsneo[4], outname = "Neonatal outcome Customized birth centile LGA")
+ormod("Customised.Birthweight.Centile_lga",
+  outname = "Neonatal outcome Customized birth centile LGA",
+  cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1)
+)
 ```
 
 \clearpage
 
 ```{r predorprint10, dependson="predor", cache=cacheon}
-pormod(outvarsneo[5], outname = "Neonatal outcome Cord artery pH")
+pormod("Cord.arterial.pH_cat_imp",
+  outname = "Neonatal outcome Cord artery pH",
+  cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1)
+)
 ```
 
 \clearpage
 
 ```{r predorprint11, dependson="predor", cache=cacheon}
-pormod(outvarsneo[6], outname = "Neonatal outcome Cord artery BE")
+pormod("Cord.artery.BE_cat_imp",
+  outname = "Neonatal outcome Cord artery BE",
+  cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1)
+)
 ```
 
 \clearpage
 
 ```{r predorprint12, dependson="predor", cache=cacheon}
-pormod(outvarsneo[7], outname = "Neonatal outcome Apgar 1 min")
+pormod("Apgar.score.1.min_cat", outname = "Neonatal outcome Apgar 1 min", cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1))
 ```
 
 \clearpage
 
 ```{r predorprint13, dependson="predor", cache=cacheon}
-pormod(outvarsneo[8], outname = "Neonatal outcome Apgar 5 min")
+pormod("Apgar.score.5.min_cat", outname = "Neonatal outcome Apgar 5 min", cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1))
 ```
 
 \clearpage
 
 ```{r predorprint14, dependson="predor", cache=cacheon}
-ormod(outvarsneo[9], outname = "Intubation")
+ormod("Intubation.at.birth", outname = "Intubation", cleandata %>% filter(`Intrauterine.fetal.death.REMOVE=1` != 1))
 ```

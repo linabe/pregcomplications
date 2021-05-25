@@ -13,5 +13,6 @@ ProjectTemplate::reload.project(
 ProjectTemplate::cache("cleandata")
 ProjectTemplate::cache("tabvars")
 ProjectTemplate::cache("modvars")
+ProjectTemplate::cache("modvars2")
 ProjectTemplate::cache("outvarsmat")
 ProjectTemplate::cache("outvarsneo")
