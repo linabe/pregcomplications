@@ -3,6 +3,7 @@ tabvars <- c(
   "Age_cat",
   "BMI",
   "BMI_cat",
+  "Centre",
   "Marital.status_cat",
   "Current.living.situation_cat",
   "Tertiary.Education_cat",
@@ -11,19 +12,20 @@ tabvars <- c(
   "Income_cat_imp",
   "Cigarettes_cat",
   "Alcohol_cat",
-  "Other.Drugs_cat",
+  #"Other.Drugs_cat",
   "History.of.Depression"
 )
 modvars <- c(
   "Age_cat",
   "BMI_cat",
+  "Centre",
   "Marital.status_cat",
   "Tertiary.Education_cat",
   "Current.job.situation_cat",
   "Income_cat_imp",
   "Cigarettes_cat",
   "Alcohol_cat",
-  "Other.Drugs_cat",
+  #"Other.Drugs_cat",
   "History.of.Depression"
 )
 modvars2 <- c(
@@ -35,7 +37,7 @@ modvars2 <- c(
   "Income_cat_imp",
   "Cigarettes_cat",
   "Alcohol_cat",
-  "Other.Drugs_cat",
+  #"Other.Drugs_cat",
   "History.of.Depression"
 )
 
